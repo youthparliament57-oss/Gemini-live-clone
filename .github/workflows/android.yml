@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -27,13 +31,23 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK Licenses & Install SDK Components
+      - name: Accept Android SDK Licenses & Setup SDK
         run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools" || true
+          # Locate sdkmanager from pre-installed Android SDK
+          if [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          elif [ -f "$ANDROID_HOME/tools/bin/sdkmanager" ]; then
+            SDKMANAGER="$ANDROID_HOME/tools/bin/sdkmanager"
+          else
+            SDKMANAGER="$(which sdkmanager || echo "sdkmanager")"
+          fi
+
+          echo "Using sdkmanager at: $SDKMANAGER"
+          # Accept all licenses
+          yes | "$SDKMANAGER" --licenses || true
+
+          # Install platform 36 and build-tools 36.0.0
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0" "platform-tools" || true
 
       - name: Setup Environment Config
         run: |
