@@ -1,0 +1,6 @@
+{
+  "name": "Gemini Live",
+  "description": "Real-time conversational AI voice assistant clone of Gemini Live with interactive soundwaves, voice recognition, TTS, and camera vision.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
